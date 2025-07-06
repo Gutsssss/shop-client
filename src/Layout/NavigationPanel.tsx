@@ -1,13 +1,46 @@
 import { Menubar } from 'primereact/menubar';
-export const NavigationPanel = () =>{
-    const items = [
-        {label:'Home'},
-        {label:'Cart'}
-    ];
-    const start = <img alt="logo" src="https://primefaces.org/cdn/primereact/images/logo.png" height="40" className="mr-2"></img>;
+import { useNavigate } from 'react-router-dom';
+import { menuItems } from '../static/routes';
+import type { MenuItem } from 'primereact/menuitem';
+import { Button } from 'primereact/button';
+export const NavigationPanel = () => {
+    const navigate = useNavigate()
+    const isAuth = false
+  const setActiveClass = (label:string) => {
+    return location.pathname === `/${label}` ? 'active-menu-item' : ''
+  }
+  const processedItems: MenuItem[] = menuItems.map(item => ({
+    ...item,
+    command: () => item.label && navigate(`/${item.label}`),
+    className:setActiveClass(item.label)
+  }));
+  const endContent = (
+    <div className="flex align-items-center gap-2">
+      {isAuth ? (
+        <Button 
+          label="Logout" 
+          icon="pi pi-sign-out" 
+          onClick={() => console.log('Logout')}
+          className='buttonNavigation'
+          text
+          severity="danger"
+        />
+      ) : (
+        <>
+          <Button 
+            label="Login" 
+            icon="pi pi-sign-in" 
+            onClick={() => navigate('/login')}
+            className='buttonNavigation'
+            text
+          />
+        </>
+      )}
+    </div>
+    )
     return (
         <div className="card">
-            <Menubar model={items} start={start}/>
+            <Menubar model={processedItems} end={endContent}/>
         </div>
     )
 }
