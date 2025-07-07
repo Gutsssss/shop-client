@@ -27,7 +27,6 @@ export const ItemCard = ({name,price,rating,img}:IShopItem) => {
     )
     return (
         <Card 
-  className="w-18rem sm:w-20rem md:w-22rem lg:w-25rem"
   header={
     <div className="border-round-top-xl overflow-hidden">
       {header}

@@ -3,3 +3,4 @@ export const menuItems = [
     {label:'Cart',icon:'pi pi-shopping-cart'},
     {label:'Catalog'},
 ]
+
