@@ -52,6 +52,7 @@ export const CatalogPage = () => {
                   className="col-12 sm:col-6 lg:col-4 xl:col-3 p-2"
                 >
                   <ItemCard
+                    id={item.id}
                     name={item.name}
                     price={item.price}
                     img={item.img}

@@ -1,13 +1,13 @@
 import { PanelMenu } from 'primereact/panelmenu';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { fetchBrands, fetchTypes } from '../../store/reducers/ActionCreators';
+import type { MenuItem } from 'primereact/menuitem';
 export const FilterPanel = () => {
     const dispatch = useAppDispatch()
     const {types} = useAppSelector(state => state.typeReducer)
     const {brands} = useAppSelector(state => state.brandReducer)
-    const getFilters = () => {
-    return [
+    const items: MenuItem[] = useMemo(() => ([
         {
             label: 'Types',
             items: types.map(elem => ({
@@ -22,9 +22,7 @@ export const FilterPanel = () => {
                 value: elem.id
             }))
         },
-        
-    ];
-}
+    ]), [brands, types]);
 useEffect(() => {
     try {
         dispatch(fetchTypes())
@@ -32,10 +30,11 @@ useEffect(() => {
     } catch (error) {
         console.log(error)
     }
+// eslint-disable-next-line react-hooks/exhaustive-deps
 },[])
     return (
         <div>
-            <PanelMenu model={getFilters()} multiple/>
+            <PanelMenu model={items} multiple/>
         </div>
     )
 }

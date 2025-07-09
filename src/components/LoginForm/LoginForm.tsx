@@ -5,31 +5,52 @@ import { Password } from "primereact/password";
 import { useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { classNames } from "primereact/utils";
+import { useAppDispatch, useAppSelector } from "../../hooks/redux";
+import { login, registration } from "../../store/reducers/ActionCreators";
+
+type FormTypes = 'login' | 'register'
+type FormTextFields = {
+  formTitle: string;
+  switchButtonText: string;
+  submitButtonText: string
+}
 
 export const LoginForm = () => {
+  const dispatch = useAppDispatch()
+  const {isLoading,error} = useAppSelector(state => state.userReducer)
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
   
-  const isLogin = location.pathname === '/login';
-  const formTitle = isLogin ? 'Login' : 'Registration';
-  const switchButtonText = isLogin ? 'Need an account? Register' : 'Already have an account? Login';
-  const submitButtonText = isLogin ? 'Login' : 'Register';
+  const isLoginPath = location.pathname === '/login';
+  const formTexts: Record<FormTypes, FormTextFields> = {
+  login: {
+    formTitle: 'Login',
+    switchButtonText: 'Need an account? Register',
+    submitButtonText: 'Login'
+  },
+  register: {
+    formTitle: 'Registration',
+    switchButtonText: 'You already have an account? Log in',
+    submitButtonText: 'Registration'
+  } 
+};
+  const formType: FormTypes = isLoginPath ? 'login' : 'register'
+const {formTitle, submitButtonText, switchButtonText} = formTexts[formType]
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError("");
-    
     try {
-      navigate('/Home');
+      if(isLoginPath) {
+        await dispatch(login(email,password))
+      navigate('/catalog')
+      }
+      else {
+        await dispatch(registration(email,password))
+      }
     } catch (err:string | unknown) {
-      setError(err as string);
-    } finally {
-      setLoading(false);
+      console.log(err)
     }
   };
 
@@ -40,9 +61,9 @@ export const LoginForm = () => {
     >
       <h1 className="text-4xl m-2">{formTitle}</h1>
       
-      {error && (
+      {error as string && (
         <div className="w-full p-3 border-round bg-red-100 text-red-700">
-          {error}
+          {error as string}
         </div>
       )}
 
@@ -64,7 +85,7 @@ export const LoginForm = () => {
           id="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          feedback={!isLogin}
+          feedback={!isLoginPath}
           toggleMask
           className="w-full"
           required
@@ -75,7 +96,7 @@ export const LoginForm = () => {
 
       <div className="flex w-full justify-content-between align-items-center">
         <NavLink 
-          to={isLogin ? "/registration" : "/login"}
+          to={isLoginPath ? "/registration" : "/login"}
           className="text-primary-500 hover:text-primary-700 transition-colors"
         >
           {switchButtonText}
@@ -84,15 +105,15 @@ export const LoginForm = () => {
         <Button 
           type="submit" 
           label={submitButtonText}
-          loading={loading}
+          loading={isLoading}
           className={classNames({
-            'p-button-success': !isLogin,
-            'p-button-primary': isLogin
+            'p-button-success': !isLoginPath,
+            'p-button-primary': isLoginPath
           })}
         />
       </div>
 
-      {!isLogin && (
+      {!isLoginPath && (
         <div className="text-sm text-500 mt-2">
           Password must contain at least 8 characters, one uppercase letter and one number
         </div>
