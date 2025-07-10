@@ -38,7 +38,7 @@ export const CatalogPage = () => {
             <InputText
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Keyword"
+              placeholder="Search..."
             />
             <Button onClick={searchProduct} icon="pi pi-search" className="p-button-warning" />
           </div>

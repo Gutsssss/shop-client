@@ -1,5 +1,6 @@
 import type { AppDispatch } from "../store";
 import {
+  getOneItem,
   itemsFetching,
   itemsFetchingError,
   itemsFetchingSuccess,
@@ -48,6 +49,18 @@ export const searchProducts =
       throw error;
     }
   };
+  export const getOneProductFromApi = (id:number) => async (dispatch:AppDispatch) => {
+        
+    try {
+        dispatch(fetchItems())
+        const response = await $host.get(`api/shopitem/${id}`)
+        dispatch(getOneItem(response.data))
+        return response.data
+    }
+    catch(err) {
+        console.log(err)
+    }
+}
 //бренды и типы
 export const fetchTypes = () => async (dispatch: AppDispatch) => {
   dispatch(typeFetching());

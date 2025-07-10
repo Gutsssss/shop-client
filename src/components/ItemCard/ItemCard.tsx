@@ -23,7 +23,7 @@ export const ItemCard = ({name,price,rating,img,id}:IShopItem) => {
       className="h-full"
       style={{ 
         width: 'auto',
-        maxWidth: '100%',
+        maxWidth: '230px',
         objectFit: 'contain'
       }}
     />
@@ -38,6 +38,7 @@ const renderItemCardFooter = () => (
 )
     return (
         <Card
+        style={{'border':'1px solid white','borderRadius':'15px'}}
   header={
     <div className="border-round-top-xl overflow-hidden">
       {renderItemCardHeader({img})}
