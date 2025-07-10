@@ -8,3 +8,29 @@ body {
   margin: 0;
   padding: 0;
 }
+.p-menubar {
+  color: white;
+  border: none;
+  max-height: 50px;
+}
+.p-menuitem {
+  margin: 5px;
+}
+.p-menuitem:hover {
+  border-bottom:2px solid rgb(255, 255, 255);
+  background:none;
+}
+.active-menu-item {
+  background: rgb(255, 255, 255,0.1);
+  border-radius: 5px;
+}
+.buttonNavigation {
+  box-shadow: none !important;
+  border-color: transparent !important;
+  padding: 5px;
+  color: white;
+}
+.buttonNavigation:focus {
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
