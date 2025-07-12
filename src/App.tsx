@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom"
 import { NavigationPanel } from "./Layout/NavigationPanel"
 import { HomePage } from "./pages/HomePage/HomePage"
-import { CartPage } from "./pages/CartPage/CartPage"
+import { BasketPage } from "./pages/BasketBage/BasketPage"
 import { CatalogPage } from "./pages/CatalogPage/CatalogPage"
 import { LoginPage } from "./pages/AuthPages/LoginPage"
 import { RegistrationPage } from "./pages/AuthPages/RegistrationPage"
@@ -19,13 +19,13 @@ function App() {
     catch(err) {
       console.log(err)
     }
-  })
+  },[])
   return (
     <>
       <NavigationPanel/>
       <Routes>
         <Route path="/Home" element={<HomePage/>}/>
-        <Route path="/Cart" element={<CartPage/>}/>
+        <Route path="/Basket" element={<BasketPage/>}/>
         <Route path="/Catalog" element={<CatalogPage/>}/>
         <Route path="/Login" element={<LoginPage/>}/>
         <Route path="/Registration" element={<RegistrationPage/>}/>

@@ -26,6 +26,7 @@ import {
 } from "./userSlice.js";
 import { AxiosError } from "axios";
 import { jwtDecode } from "jwt-decode";
+import { basketFetching, basketFetchingError, basketFetchingSuccess } from "./basketSlice.js";
 //запросы по продуктам
 export const fetchItems = () => async (dispatch: AppDispatch) => {
   dispatch(itemsFetching());
@@ -113,7 +114,7 @@ export const registration =
       dispatch(userFetchingSuccess(decodedUser));
       return decodedUser;
     } catch (err: unknown) {
-      let errorMessage = "Checks failed";
+      let errorMessage = "Login Failed";
       if (err instanceof AxiosError && err.response?.data?.message) {
         errorMessage = err.response?.data?.message;
       }
@@ -151,3 +152,46 @@ export const logoutAndRemoveToken = () => async (dispatch: AppDispatch) => {
     throw errorMessage;
   }
 };
+//basket query
+export const addItemToBasket = (id:number | undefined,items:Array<object>) => async (dispatch:AppDispatch) => {
+  dispatch(basketFetching())
+  try {
+    const {data} = await $authHost.post(`api/user/${id}/add`,{items:items})
+    dispatch(basketFetching(data))
+  } catch (err: unknown) {
+    let errorMessage = "Не удалось добавить в корзину";
+    if (err instanceof AxiosError && err.response?.data?.message) {
+      errorMessage = err.response?.data?.message;
+    }
+    dispatch(basketFetchingError(errorMessage));
+    throw errorMessage;
+  }
+}
+export const getBasket = (id:number | undefined) => async(dispatch:AppDispatch) => {
+    dispatch(basketFetching())
+  try {
+    const {data} = await $authHost.get(`api/basket/${id}`)
+    dispatch(basketFetchingSuccess(data))
+  } catch (err: unknown) {
+    let errorMessage = "Не удалось отобразить корзину";
+    if (err instanceof AxiosError && err.response?.data?.message) {
+      errorMessage = err.response?.data?.message;
+    }
+    dispatch(basketFetchingError(errorMessage));
+    throw errorMessage;
+  }
+}
+export const removeItemFromBasket = (userId:number|undefined,itemId:number) => async(dispatch:AppDispatch) => {
+    dispatch(basketFetching())
+  try {
+    const {data} = await $authHost.delete(`api/basket/${userId}/basket/${itemId}`)
+    dispatch(basketFetchingSuccess(data))
+  } catch (err: unknown) {
+    let errorMessage = "Не удалось удалить товар";
+    if (err instanceof AxiosError && err.response?.data?.message) {
+      errorMessage = err.response?.data?.message;
+    }
+    dispatch(basketFetchingError(errorMessage));
+    throw errorMessage;
+  }
+}

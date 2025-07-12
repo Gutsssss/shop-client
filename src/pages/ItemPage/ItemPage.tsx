@@ -9,7 +9,7 @@ import {
 import { ProgressSpinner } from "primereact/progressspinner";
 import { TabPanel, TabView } from "primereact/tabview";
 import { SameItems } from "../../components/SameItems/SameItems";
-
+import './ItemPage.css'
 export const ItemPage = () => {
   const dispatch = useAppDispatch();
   const { item, isLoading } = useAppSelector((state) => state.itemReducer);
@@ -32,11 +32,15 @@ export const ItemPage = () => {
   return (
     <div>
       <OnePageItem currentItem={item!} keyItem={Number(id)} />
-      <TabView>
-        <TabPanel header='Same Type'>
+      <TabView style={{ 
+    width: 'fit-content',
+    margin: '0 auto',
+    padding:'20px'
+  }}>
+        <TabPanel header='Same Type' className="custom-tabpanel">
             <SameItems category='type' value={item.typeId}/>
         </TabPanel>
-        <TabPanel header='Same Brand'>
+        <TabPanel header='Same Brand' className="custom-tabpanel">
             <SameItems category='brand' value={item.brandId}/>
         </TabPanel>
       </TabView>

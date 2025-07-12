@@ -2,15 +2,20 @@ import { Card } from "primereact/card"
 import type { IShopItem } from "../../models/IShopItem"
 import { Button } from "primereact/button"
 import { Rating } from "primereact/rating"
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import { NavLink } from "react-router-dom"
+import { useAppDispatch, useAppSelector } from "../../hooks/redux"
+import { addItemToBasket } from "../../store/reducers/ActionCreators"
 
 interface RenderItemCardHeaderProps {
   img: IShopItem['img']
 }
 
-export const ItemCard = ({name,price,rating,img,id}:IShopItem) => {
-    const [ratingVal,setRatingVal] = useState(0)
+export const ItemCard = ({name,price,rating,img,id,brandId}:IShopItem) => {  
+  const dispatch = useAppDispatch()
+  const [ratingVal,setRatingVal] = useState(0)
+  const {brands} = useAppSelector(state => state.brandReducer)
+  const {user} = useAppSelector(state => state.userReducer)
     const renderItemCardHeader = ({img}: RenderItemCardHeaderProps) => (
   <div className="border-round-top-xl overflow-hidden">
     <NavLink to={`/Catalog/${id}`} >
@@ -31,14 +36,25 @@ export const ItemCard = ({name,price,rating,img,id}:IShopItem) => {
     </NavLink>
   </div>
 )
+const addToBasket = () => {
+    try {
+      dispatch(addItemToBasket(user?.id,[{name:name}]))
+    } catch (error) {
+      console.log(error)
+    }
+  }
+const brand = useCallback((id:string|number) => {
+  return brands.find(elem => elem.id === id)?.name
+},[brands])
 const renderItemCardFooter = () => (
   <div className="flex justify-content-between align-items-center">
-    <Button outlined><i className='pi pi-shopping-cart'></i>Add to cart</Button>
+    <Button onClick={addToBasket} outlined label="Добавить в корзину" icon="pi pi-shopping-cart"/>
   </div>
 )
+  
     return (
         <Card
-        style={{'border':'1px solid white','borderRadius':'15px'}}
+        style={{'border':'1px solid gray','borderRadius':'15px'}}
   header={
     <div className="border-round-top-xl overflow-hidden">
       {renderItemCardHeader({img})}
@@ -51,7 +67,11 @@ const renderItemCardFooter = () => (
     </div>
   }
 >
-  <div className="flex flex-column gap-3">
+  
+  <div className="flex flex-column gap-2">
+    <div>
+    <span>{brand(brandId)}</span>
+  </div>
     <div className="flex align-items-center gap-2">
       <Rating 
         value={rating} 
@@ -61,9 +81,8 @@ const renderItemCardFooter = () => (
       />
       <span className="font-semibold text-600">{rating}</span>
     </div>
-    
     <div className="flex align-items-center">
-      <span className="text-2xl font-bold text-purple-500">₽{price}</span>
+      <span className="text-xl text-purple-500">₽{price}</span>
     </div>
   </div>
 </Card>

@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { IShopItem } from "../../models/IShopItem";
 import { Rating } from "primereact/rating";
 import { Button } from "primereact/button";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import { fetchBrands, fetchTypes } from "../../store/reducers/ActionCreators";
+import type { IBrand } from "../../models/IBrand";
+import type { IType } from "../../models/IType";
 
 interface ProductProps {
   currentItem: IShopItem;
@@ -20,12 +22,11 @@ export const OnePageItem = ({ currentItem, keyItem }: ProductProps) => {
     dipatch(fetchBrands());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keyItem]);
-  const getType = (id: number | string) => {
-    return types.filter((elem) => elem.id === id)[0]?.name;
-  };
-  const getBrand = (id: number | string) => {
-    return brands.filter((elem) => elem.id === id)[0]?.name;
-  };
+  const getInfo = useCallback((category: IBrand[] | IType[], id:number | string) => {
+        if (!category) return [];
+        return category.filter(item => item.id === id)[0]?.name;
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      },[types,brands]);
   return (
     <div
       key={keyItem}
@@ -63,9 +64,9 @@ export const OnePageItem = ({ currentItem, keyItem }: ProductProps) => {
           />
           <span className="font-semibold text-600">{productData.rating}</span>
         </div>
-        <h3>{getBrand(productData.brandId)}</h3>
+        <h3>{getInfo(brands,productData.brandId)}</h3>
         <h3>
-          <span style={{ color: "grey" }}>{getType(productData.typeId)}</span>{" "}
+          <span style={{ color: "grey" }}>{getInfo(types,productData.typeId)}</span>{" "}
           {productData.name}
         </h3>
         <h1>₽{productData.price}</h1>

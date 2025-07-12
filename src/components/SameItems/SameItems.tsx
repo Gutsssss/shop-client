@@ -17,7 +17,7 @@ export const SameItems = ({ category, value }: SameItemsProps) => {
     },[items]);
     return (
         <div>
-            <div className="flex justify-content-evenly">
+            <div className="flex justify-content-center gap-5">
             {sameItems(category, value).map(item => (
                 <ItemCard
                     key={item.id}

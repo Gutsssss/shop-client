@@ -1,0 +1,22 @@
+.p-tabview {
+  background: (var(--p-surface-50), var(--p-surface-950));
+  color: white;
+}
+
+.p-tabview .p-tabview-nav li .p-tabview-nav-link {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+  color: white;
+  border-color: white;
+}
+.p-tabview-panels {
+    background-color: transparent;
+}
+.p-tabview .p-tabview-nav {
+    border: none;
+}
+.p-tabview .p-tabview-nav li .p-tabview-nav-link {
+    margin: 10px;
+}

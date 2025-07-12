@@ -5,6 +5,7 @@ import type { MenuItem } from "primereact/menuitem";
 import { Button } from "primereact/button";
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
 import { logoutAndRemoveToken } from "../store/reducers/ActionCreators";
+
 export const NavigationPanel = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate();
@@ -12,11 +13,22 @@ export const NavigationPanel = () => {
   const setActiveClass = (label: string) => {
     return location.pathname === `/${label}` ? "active-menu-item" : "";
   };
-  const processedItems: MenuItem[] = menuItems.map((item) => ({
-    ...item,
-    command: () => item.label && navigate(`/${item.label}`),
-    className: setActiveClass(item.label),
-  }));
+  const processMenuItems = (items: typeof menuItems): MenuItem[] => {
+    return items.map((item) => {
+      const menuItem: MenuItem = {
+        ...item,
+        className: item.label && setActiveClass(item.label) ? "active-menu-item" : "",
+      };
+
+      if (item.items) {
+        menuItem.items = processMenuItems(item.items);
+      } else if (item.label) {
+        menuItem.command = () => navigate(`/${item.label}`);
+      }
+
+      return menuItem;
+    });
+  };
   const handleLogout = () => {
     try {
       dispatch(logoutAndRemoveToken())
@@ -27,6 +39,8 @@ export const NavigationPanel = () => {
   }
   const endContent = (
     <div className="flex align-items-center gap-2">
+      <div>
+      </div>
       {isAuth ? (
         <Button
           label="Logout"
@@ -51,7 +65,7 @@ export const NavigationPanel = () => {
   );
   return (
     <div className="card">
-      <Menubar model={processedItems} end={endContent} />
+      <Menubar model={processMenuItems(menuItems)} end={endContent} />
     </div>
   );
 };

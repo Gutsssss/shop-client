@@ -34,3 +34,6 @@ body {
   box-shadow: none !important;
   border-color: transparent !important;
 }
+.p-card .p-card-content {
+  padding: 0;
+}
