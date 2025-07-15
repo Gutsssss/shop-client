@@ -39,8 +39,6 @@ export const NavigationPanel = () => {
   }
   const endContent = (
     <div className="flex align-items-center gap-2">
-      <div>
-      </div>
       {isAuth ? (
         <Button
           label="Logout"

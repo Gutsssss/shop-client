@@ -1,0 +1,39 @@
+/* Стили карточки */
+.brand-card {
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    border: 1px solid gray;
+    cursor: pointer;
+    transition: all 0.3s ease-out;
+    font-size: 1rem;
+}
+
+.brand-card:hover {
+    background: rgb(55, 65, 81);
+}
+
+/* Адаптация под разные экраны */
+@media (max-width: 768px) {
+    .brands-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    }
+    .brand-card {
+        height: 60px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .brands-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 8px;
+        padding: 8px;
+    }
+    .brand-card {
+        height: 50px;
+        font-size: 0.8rem;
+    }
+}

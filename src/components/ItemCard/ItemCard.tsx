@@ -53,6 +53,7 @@ const renderItemCardFooter = () => (
 )
   
     return (
+      <>
         <Card
         style={{'border':'1px solid gray','borderRadius':'15px'}}
   header={
@@ -86,5 +87,6 @@ const renderItemCardFooter = () => (
     </div>
   </div>
 </Card>
+</>
     )
 }

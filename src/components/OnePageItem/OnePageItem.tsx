@@ -3,7 +3,7 @@ import type { IShopItem } from "../../models/IShopItem";
 import { Rating } from "primereact/rating";
 import { Button } from "primereact/button";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
-import { fetchBrands, fetchTypes } from "../../store/reducers/ActionCreators";
+import { addItemToBasket, fetchBrands, fetchTypes } from "../../store/reducers/ActionCreators";
 import type { IBrand } from "../../models/IBrand";
 import type { IType } from "../../models/IType";
 
@@ -13,13 +13,21 @@ interface ProductProps {
 }
 
 export const OnePageItem = ({ currentItem, keyItem }: ProductProps) => {
-  const dipatch = useAppDispatch();
+  const dispatch = useAppDispatch();
   const [productData] = useState(currentItem);
   const { types } = useAppSelector((state) => state.typeReducer);
   const { brands } = useAppSelector((state) => state.brandReducer);
+  const { user } = useAppSelector((state) => state.userReducer);
+  const addToBasket = () => {
+      try {
+        dispatch(addItemToBasket(user?.id,[{name:currentItem.name}]))
+      } catch (error) {
+        console.log(error)
+      }
+    }
   useEffect(() => {
-    dipatch(fetchTypes());
-    dipatch(fetchBrands());
+    dispatch(fetchTypes());
+    dispatch(fetchBrands());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keyItem]);
   const getInfo = useCallback((category: IBrand[] | IType[], id:number | string) => {
@@ -70,9 +78,7 @@ export const OnePageItem = ({ currentItem, keyItem }: ProductProps) => {
           {productData.name}
         </h3>
         <h1>₽{productData.price}</h1>
-        <Button outlined>
-          <i className="pi pi-shopping-cart"></i>Add to cart
-        </Button>
+        <Button onClick={addToBasket} outlined label="Добавить в корзину" icon="pi pi-shopping-cart"/>
       </div>
     </div>
   );

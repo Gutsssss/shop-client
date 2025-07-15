@@ -37,3 +37,11 @@ body {
 .p-card .p-card-content {
   padding: 0;
 }
+.brands-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    padding: 12px;
+    max-width: 900px;
+    margin: 0 auto;
+}

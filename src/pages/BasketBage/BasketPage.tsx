@@ -1,15 +1,21 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import { getBasket, removeItemFromBasket } from "../../store/reducers/ActionCreators";
 import { DataScroller } from 'primereact/datascroller';
 import { Button } from "primereact/button";
 import { Rating } from "primereact/rating";
 import type { IShopItem } from "../../models/IShopItem";
+import { Toast } from "primereact/toast";
 
 export const BasketPage = () => {
     const dispatch = useAppDispatch();
-    const { basket, isLoading, error } = useAppSelector(state => state.basketReducer);
+    const { basket, isLoading } = useAppSelector(state => state.basketReducer);
     const {user} = useAppSelector(state => state.userReducer)
+    const baseketLength = basket?.items.length
+    const toast = useRef<Toast>(null);
+    const showToast = (type:'success'| 'error',summary:'Success' | 'Error',details:string) => {
+        toast.current?.show({severity:type, summary:summary, detail:details, life: 3000})
+    }
     const sumPrice = useCallback(() => {
   let sum = 0;
   if (basket) {
@@ -21,11 +27,14 @@ export const BasketPage = () => {
   }
   return sum;
 }, [basket]);
-    const removeFromBasket =(id:number) => {
+
+    const removeFromBasket = async (id:number) => {
         try {
-            dispatch(removeItemFromBasket(user?.id,id))
-        } catch (error) {   
-            console.log(error)
+            await dispatch(removeItemFromBasket(user?.id,id))
+            showToast('success','Success','Товар успешно удален!')
+        } catch (err) {   
+            console.log(err)
+            showToast('error','Error','Ошибка при удалении товара')
         }
     }
     useEffect(() => {
@@ -41,7 +50,7 @@ export const BasketPage = () => {
     const itemTemplate = (item:IShopItem) => {
         return (
             <div className="col-12" key={item.id}>
-                <div className="flex flex-column xl:flex-row xl:align-items-center p-4 gap-4">
+                <div className="flex flex-column xl:flex-row xl:align-items-center p-4 gap-5">
                     <img 
                         className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" 
                         src={`${import.meta.env.VITE_APP_API_URL}${item.shop_item?.img}`} 
@@ -82,23 +91,25 @@ export const BasketPage = () => {
     };
 
     if (isLoading) return <div>Loading...</div>;
-    if (error) return <div>Error: {`${error}`}</div>;
 
     return (
         <div className="card">
+            <Toast ref={toast} />
             <div className="flex flex-column justify-content-center align-items-center mb-4">
                 <h2>Your Basket</h2>
-                <div className="text-xl">
+                {baseketLength > 0 ? (<div className="text-xl">
                     Total: ₽{sumPrice() || 0} ({basket?.totalItems || 0} items)
-                </div>
+                </div>)
+                : (null)}
+                
             </div>
-            
-            {basket?.items?.length > 0 ? (
+            {baseketLength > 0 ? (
                 <DataScroller
                     value={basket.items} 
                     itemTemplate={itemTemplate} 
                     rows={5} 
-                    buffer={0.4} 
+                    buffer={0.4}
+                    inline
                 />
             ) : (
                 <div className="text-center py-4">Your basket is empty</div>

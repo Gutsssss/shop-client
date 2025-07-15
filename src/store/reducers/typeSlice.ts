@@ -6,7 +6,8 @@ interface TypeState {
   types: IType[];
   isLoading: boolean;
   error: string | unknown;
-  type:IType
+  type:IType,
+  selectedTypes:object[]
 }
 
 const initialState: TypeState = {
@@ -16,7 +17,8 @@ const initialState: TypeState = {
   type:{
     id:null,
     name:''
-  }
+  },
+  selectedTypes:[]
 };
 
 export const typeSlice = createSlice({
@@ -35,6 +37,9 @@ export const typeSlice = createSlice({
       state.isLoading = false
       state.type = action.payload
     },
+    getSelectedTypes(state,action) {
+      state.selectedTypes = action.payload
+    },
     typeFetchingError(state, actions:PayloadAction<string | unknown>) {
       state.isLoading = false;
       state.error = actions.payload
@@ -42,5 +47,5 @@ export const typeSlice = createSlice({
   },
 });
 
-export const {typeFetching,typeFetchingSuccess,typeFetchingError,createType} = typeSlice.actions;
+export const {typeFetching,typeFetchingSuccess,typeFetchingError,createType,getSelectedTypes} = typeSlice.actions;
 export const typeReducer = typeSlice.reducer;

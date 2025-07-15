@@ -27,6 +27,8 @@ import {
 import { AxiosError } from "axios";
 import { jwtDecode } from "jwt-decode";
 import { basketFetching, basketFetchingError, basketFetchingSuccess } from "./basketSlice.js";
+import type { IType } from "../../models/IType.js";
+import type { IBrand } from "../../models/IBrand.js";
 //запросы по продуктам
 export const fetchItems = () => async (dispatch: AppDispatch) => {
   dispatch(itemsFetching());
@@ -182,7 +184,7 @@ export const getBasket = (id:number | undefined) => async(dispatch:AppDispatch) 
   }
 }
 export const removeItemFromBasket = (userId:number|undefined,itemId:number) => async(dispatch:AppDispatch) => {
-    dispatch(basketFetching())
+    // dispatch(basketFetching())
   try {
     const {data} = await $authHost.delete(`api/basket/${userId}/basket/${itemId}`)
     dispatch(basketFetchingSuccess(data))
@@ -194,4 +196,12 @@ export const removeItemFromBasket = (userId:number|undefined,itemId:number) => a
     dispatch(basketFetchingError(errorMessage));
     throw errorMessage;
   }
+}
+export const handleGetFilterObj = (category:'Types' | 'Brands',brands?:IBrand[],types?:IType[]) => {
+    const source = category === 'Types' ? types : brands;
+      return source?.map(elem => ({
+        name: elem.name || '',
+        code: elem.id?.toString() || ''
+      })) || [];
+
 }

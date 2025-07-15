@@ -5,7 +5,8 @@ interface TypeState {
   brands: IBrand[];
   isLoading: boolean;
   error: string | unknown;
-  brand:IBrand
+  brand:IBrand,
+  selectedBrands:object[]
 }
 
 const initialState: TypeState = {
@@ -15,7 +16,8 @@ const initialState: TypeState = {
   brand:{
     id:null,
     name:'',
-  }
+  },
+  selectedBrands:[]
 };
 
 export const brandSlice = createSlice({
@@ -34,6 +36,9 @@ export const brandSlice = createSlice({
       state.isLoading = false
       state.brand = action.payload
     },
+    getSelectedBrands(state,action) {
+      state.selectedBrands = action.payload
+    },
     brandFetchingError(state, actions:PayloadAction<string | unknown>) {
       state.isLoading = false;
       state.error = actions.payload
@@ -41,5 +46,5 @@ export const brandSlice = createSlice({
   },
 });
 
-export const {brandFetching,brandFetchingSuccess,brandFetchingError,createBrand} = brandSlice.actions;
+export const {brandFetching,brandFetchingSuccess,brandFetchingError,createBrand,getSelectedBrands} = brandSlice.actions;
 export const brandReducer = brandSlice.reducer;
