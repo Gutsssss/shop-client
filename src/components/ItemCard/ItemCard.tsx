@@ -2,7 +2,7 @@ import { Card } from "primereact/card"
 import type { IShopItem } from "../../models/IShopItem"
 import { Button } from "primereact/button"
 import { Rating } from "primereact/rating"
-import React, { useCallback, useState } from "react"
+import React, { useCallback } from "react"
 import { NavLink } from "react-router-dom"
 import { useAppDispatch, useAppSelector } from "../../hooks/redux"
 import { addItemToBasket } from "../../store/reducers/ActionCreators"
@@ -13,7 +13,6 @@ interface RenderItemCardHeaderProps {
 
 export const ItemCard = React.memo(({name,price,rating,img,id,brandId}:IShopItem) => {  
   const dispatch = useAppDispatch()
-  const [ratingVal,setRatingVal] = useState(0)
   const {brands} = useAppSelector(state => state.brandReducer)
   const {user} = useAppSelector(state => state.userReducer)
     const renderItemCardHeader = ({img}: RenderItemCardHeaderProps) => (
@@ -76,7 +75,6 @@ const renderItemCardFooter = () => (
     <div className="flex align-items-center gap-2">
       <Rating 
         value={rating} 
-        onChange={(e) => setRatingVal(Number(e.value))} 
         cancel={false} 
         className="mr-2"
       />
