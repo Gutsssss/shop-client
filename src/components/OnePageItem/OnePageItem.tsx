@@ -54,12 +54,10 @@ export const OnePageItem = ({ currentItem, keyItem }: ProductProps) => {
         />
         <div>
           <h1>О товаре</h1>
-          <p style={{width:500}}>
-            Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-            Necessitatibus dolores animi, reprehenderit quam autem perferendis
-            sit sapiente assumenda quaerat voluptatum aspernatur fuga corporis,
-            beatae illum distinctio facere nostrum aliquid laborum?
-          </p>
+          {currentItem.info!.length > 0 ? <p style={{width:500}}>
+            {currentItem.info?.[0].fullDescription}
+          </p> : ('У товара пока нет описания')}
+          
         </div>
       </div>
       <div>

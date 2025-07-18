@@ -7,7 +7,7 @@ interface TypeState {
   isLoading: boolean;
   error: string | unknown;
   type:IType,
-  selectedTypes:object[]
+  selectedTypes:{name:string,code:string}[]
 }
 
 const initialState: TypeState = {

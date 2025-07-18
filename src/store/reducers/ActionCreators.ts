@@ -29,6 +29,7 @@ import { jwtDecode } from "jwt-decode";
 import { basketFetching, basketFetchingError, basketFetchingSuccess } from "./basketSlice.js";
 import type { IType } from "../../models/IType.js";
 import type { IBrand } from "../../models/IBrand.js";
+import { commentsFetching, commentsFetchingSuccess } from "./commentsSlice.js";
 //запросы по продуктам
 export const fetchItems = () => async (dispatch: AppDispatch) => {
   dispatch(itemsFetching());
@@ -204,4 +205,29 @@ export const handleGetFilterObj = (category:'Types' | 'Brands',brands?:IBrand[],
         code: elem.id?.toString() || ''
       })) || [];
 
+}
+//Comments
+interface createCommentOptions {
+  userId:number,
+  itemId:number,
+  text:string,
+  rating:number
+}
+export const getCommentsFromApi = (itemId:number) => async(dispatch:AppDispatch) => {
+    dispatch(commentsFetching())
+  try {
+    const {data} = await $host.get(`api/shopitem/${itemId}/comments`)
+    dispatch(commentsFetchingSuccess(data.data))
+  } catch (error) {
+    console.log(error)
+  }
+}
+export const createCommentFromUser = (options:createCommentOptions) => async(dispatch:AppDispatch) => {
+  dispatch(commentsFetching())
+  try {
+    const response = $authHost.post('api/user/comment',options)
+    return response
+  } catch (error) {
+    console.log(error)
+  }
 }

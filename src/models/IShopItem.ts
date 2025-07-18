@@ -21,7 +21,10 @@ export interface IShopItem {
     price:number | string,
     rating?:number,
     img:File | string,
-    info?:string,
+    info?:[{
+        id:number,
+        fullDescription:string
+    }],
     createdAt?:Date | string,
     updatedAr?:Date | string,
     typeId:number | string,

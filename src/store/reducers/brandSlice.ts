@@ -6,7 +6,7 @@ interface TypeState {
   isLoading: boolean;
   error: string | unknown;
   brand:IBrand,
-  selectedBrands:object[]
+  selectedBrands:{name:string,code:string}[]
 }
 
 const initialState: TypeState = {
