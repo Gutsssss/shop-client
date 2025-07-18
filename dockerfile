@@ -2,9 +2,10 @@ FROM node:18-bullseye as build
 
 ARG VITE_APP_API_URL
 
-RUN echo "VITE_APP_API_URL=${VITE_APP_API_URL}" > /app/.env.production
-
 WORKDIR /app
+
+RUN echo "VITE_APP_API_URL=${VITE_APP_API_URL}" > .env.production
+
 COPY package*.json ./
 RUN npm ci
 COPY . .
