@@ -45,7 +45,7 @@ export const CreateCommentForm = ({
             itemId,
             userId: user.id!,
             text: text.trim(),
-            rating: rating as number
+            rating: rating || 0
         });
         setText('')
         setRating(0)
@@ -87,7 +87,13 @@ export const CreateCommentForm = ({
                     </label>
                     <Rating 
                         value={rating} 
-                        onChange={(e) => setRating(e.value)} 
+                        onChange={(e) => {
+    if (e.value !== null && e.value !== undefined) {
+      setRating(e.value);
+    } else {
+      setRating(0); // или null, в зависимости от вашей логики
+    }
+  }} 
                         cancel={false}
                         className="mb-2"
                     />
