@@ -23,7 +23,7 @@ export const LoginForm = () => {
   const location = useLocation();
   const navigate = useNavigate();
   
-  const isLoginPath = location.pathname === '/login';
+  const isLoginPath = location.pathname === '/login' || '/Login';
   const formTexts: Record<FormTypes, FormTextFields> = {
   login: {
     formTitle: 'Login',

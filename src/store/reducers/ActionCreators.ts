@@ -44,7 +44,9 @@ export const searchProducts =
   (searchValue: string) => async (dispatch: AppDispatch) => {
     try {
       dispatch(itemsFetching());
-      const response = await $host.get(`api/shopitem/search/${searchValue}`);
+      const response = await $host.get(`api/shopitem/search/`,{
+        params: { name: searchValue }
+      });
       dispatch(itemsFetchingSuccess(response.data));
       return response.data;
     } catch (err) {

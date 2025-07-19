@@ -9,6 +9,7 @@ import { useAppDispatch } from "./hooks/redux"
 import { useEffect } from "react"
 import { check } from "./store/reducers/ActionCreators"
 import { ItemPage } from "./pages/ItemPage/ItemPage"
+import { ProtectedRoute } from "./components/ProtectedRoute/ProtectedRoute"
 
 function App() {
   const dispatch = useAppDispatch()
@@ -19,13 +20,18 @@ function App() {
     catch(err) {
       console.log(err)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   },[])
   return (
     <>
       <NavigationPanel/>
       <Routes>
         <Route path="/Home" element={<HomePage/>}/>
-        <Route path="/Basket" element={<BasketPage/>}/>
+        <Route path="/Basket" element={
+          <ProtectedRoute>
+            <BasketPage/>
+          </ProtectedRoute>
+        }/>
         <Route path="/Catalog" element={<CatalogPage/>}/>
         <Route path="/Login" element={<LoginPage/>}/>
         <Route path="/Registration" element={<RegistrationPage/>}/>

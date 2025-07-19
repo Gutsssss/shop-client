@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef, useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import { fetchItems, searchProducts } from "../../store/reducers/ActionCreators";
 import { ItemCard } from "../../components/ItemCard/ItemCard";
@@ -15,7 +15,7 @@ export const CatalogPage = () => {
   const dispatch = useAppDispatch();
   const location = useLocation();
   const { state } = location;
-  const { items, isLoading } = useAppSelector((state) => state.itemReducer);
+  const { items, isLoading, } = useAppSelector((state) => state.itemReducer);
   const { selectedTypes } = useAppSelector((state) => state.typeReducer);
   const { selectedBrands } = useAppSelector((state) => state.brandReducer);
   const selectedBrandFromRoute = state?.selectedBrand;
@@ -23,25 +23,53 @@ export const CatalogPage = () => {
   const [visibleItems, setVisibleItems] = useState(12);
   const containerRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
+  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [scrollTimeout, setScrollTimeout] = useState<NodeJS.Timeout | null>(null);
 
-  const searchProduct = () => {
-    dispatch(searchProducts(search.trim()));
-    setVisibleItems(12);
-  };
-
-  const handleTypesChange = (values: object) => {
-    dispatch(getSelectedTypes(values));
-    setVisibleItems(12);
-  };
-
-  const handleBrandsChange = (values: unknown[]) => {
-    dispatch(getSelectedBrands(values));
-    setVisibleItems(12);
-    
-    if (values.length === 0 && selectedBrandFromRoute) {
-      navigate(location.pathname, { replace: true, state: {} });
+  const handleSearch = useCallback((query: string) => {
+    if (query.trim() === "") {
+      dispatch(fetchItems());
+    } else {
+      dispatch(searchProducts(query.trim()));
     }
-  };
+    setVisibleItems(12);
+  }, [dispatch]);
+
+  const debouncedSearch = useCallback((query: string) => {
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+    
+    const timeoutId = setTimeout(() => {
+      handleSearch(query);
+    }, 500);
+    
+    setSearchTimeout(timeoutId);
+  }, [handleSearch, searchTimeout]);
+
+  const searchProduct = useCallback(() => {
+    debouncedSearch(search);
+  }, [search, debouncedSearch]);
+
+  const handleTypesChange = useCallback(
+    (values: object) => {
+      dispatch(getSelectedTypes(values));
+      setVisibleItems(12);
+    },
+    [dispatch]
+  );
+
+  const handleBrandsChange = useCallback(
+    (values: unknown[]) => {
+      dispatch(getSelectedBrands(values));
+      setVisibleItems(12);
+      
+      if (values.length === 0 && selectedBrandFromRoute) {
+        navigate(location.pathname, { replace: true, state: {} });
+      }
+    },
+    [dispatch, navigate, location.pathname, selectedBrandFromRoute]
+  );
 
   useEffect(() => {
     dispatch(fetchItems());
@@ -53,44 +81,79 @@ export const CatalogPage = () => {
   }, [dispatch, selectedBrandFromRoute, location.pathname, navigate]);
 
   const filteredItems = useMemo(() => {
-    return items.filter(item => {
+    let result = items;
+    
+    if (search) {
+      result = result.filter(item => 
+        item.name.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+    
+    return result.filter(item => {
       const typeMatch = selectedTypes.length === 0 || 
         selectedTypes.some(type => type.code === item.typeId?.toString());
-    
+      
       const brandMatch = selectedBrands.length === 0 || 
         selectedBrands.some(brand => brand.code === item.brandId?.toString());
-    
+      
       return typeMatch && brandMatch;
     });
-  }, [items, selectedTypes, selectedBrands]);
+  }, [items, search, selectedTypes, selectedBrands]);
 
   const displayedItems = useMemo(() => {
     return filteredItems.slice(0, visibleItems);
   }, [filteredItems, visibleItems]);
+
   useEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
+    if (!container || isLoading) return;
 
     const handleScroll = () => {
       if (loadingRef.current) return;
+      
       const { scrollTop, scrollHeight, clientHeight } = container;
       const isNearBottom = scrollHeight - (scrollTop + clientHeight) < 500;
 
       if (isNearBottom && visibleItems < filteredItems.length) {
         loadingRef.current = true;
-        setTimeout(() => {
-          setVisibleItems(prev => Math.min(prev + 12, filteredItems.length));
-          loadingRef.current = false;
-          
-        }, 300);
+        
+        if (scrollTimeout) {
+          clearTimeout(scrollTimeout);
+        }
+        
+        const timeoutId = setTimeout(() => {
+          setVisibleItems(prev => {
+            const newValue = Math.min(prev + 12, filteredItems.length);
+            loadingRef.current = false;
+            return newValue;
+          });
+        }, 100);
+        
+        setScrollTimeout(timeoutId);
       }
     };
 
     container.addEventListener('scroll', handleScroll);
-    return () => container.removeEventListener('scroll', handleScroll);
-  }, [filteredItems.length, visibleItems]);
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+    };
+  }, [filteredItems.length, visibleItems, isLoading, scrollTimeout]);
 
-  if (isLoading) {
+  useEffect(() => {
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+    };
+  }, [searchTimeout, scrollTimeout]);
+
+  if (isLoading && visibleItems === 12) {
     return (
       <div className="text-center">
         <ProgressSpinner />
@@ -117,8 +180,14 @@ export const CatalogPage = () => {
           <div className="p-3 p-inputgroup border-round shadow-1 mb-3 sticky top-0 z-1 surface-ground">
             <InputText
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search..."
+              onChange={(e) => {
+                setSearch(e.target.value);
+                if (e.target.value === "") {
+                  dispatch(fetchItems());
+                }
+              }}
+              placeholder="Поиск..."
+              onKeyPress={(e) => e.key === 'Enter' && searchProduct()}
             />
             <Button
               onClick={searchProduct}
@@ -128,7 +197,9 @@ export const CatalogPage = () => {
           </div>
           
           {!filteredItems.length ? (
-            <div className="text-center p-5">Товары не найдены</div>
+            <div className="text-center p-5">
+              {search ? 'Ничего не найдено' : 'Товары не найдены'}
+            </div>
           ) : (
             <>
               <div className="grid">
@@ -158,7 +229,7 @@ export const CatalogPage = () => {
               
               {visibleItems >= filteredItems.length && filteredItems.length > 0 && (
                 <div className="text-center p-3 text-color-secondary">
-                  Вы просмотрели все товары
+                  Показано {filteredItems.length} из {filteredItems.length} товаров
                 </div>
               )}
             </>

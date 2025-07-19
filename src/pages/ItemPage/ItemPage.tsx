@@ -101,7 +101,7 @@ export const ItemPage = () => {
   if (isLoading || !item || item.id !== Number(id)) {
     return <ProgressSpinner />;
   }
-
+console.log(comments)
   return (
     <div className="container mx-auto px-4">
       <Toast ref={toast} position="top-right" />
@@ -140,7 +140,7 @@ export const ItemPage = () => {
         {isCommentsLoading ? (
           <ProgressSpinner />
         ) : (
-          comments.map(comment => (
+          comments.comments.map(comment => (
             <CommentCard key={comment.id} comment={comment}/>
           ))
         )}
